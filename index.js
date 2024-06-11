@@ -11,8 +11,8 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Rutas
-const userRoutes = require('./routes/users');
-app.use('/api/users', userRoutes);
+const registroConferenciasRoutes = require('./routes/registroConferencias');
+app.use('/api/registros', registroConferenciasRoutes);
 
 // Sincronizar la base de datos
 sequelize.sync().then(() => {

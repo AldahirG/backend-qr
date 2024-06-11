@@ -2,27 +2,32 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const User = sequelize.define('User', {
-  nombre: {
+  idregistro_conferencias: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  Nombre: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  correo: {
+  Correo: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  telefono: {
+  Telefono: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  nivel_estudios: {
+  Nivel_Estudios: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  conferencista: {
+  Conferencista: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  nombre_invito: {
+  Nombre_invito: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -36,6 +41,7 @@ const User = sequelize.define('User', {
   },
 }, {
   timestamps: false,
+  tableName: 'registro_conferencias'
 });
 
 module.exports = User;
