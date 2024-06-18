@@ -69,3 +69,63 @@ exports.deleteRegistro = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Obtener asistencias agrupadas por "quien invitó"
+exports.getAssistancesByConferencista = async (req, res) => {
+  try {
+    const conferencista = req.params.conferencista;
+    const results = await RegistroConferencias.findAll({
+      attributes: [
+        'Nombre_invito',
+        [Sequelize.fn('COUNT', Sequelize.col('Nombre_invito')), 'total']
+      ],
+      where: { Conferencista: conferencista },
+      group: ['Nombre_invito'],
+      order: [[Sequelize.literal('total'), 'DESC']]
+    });
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Obtener programas de interés agrupados por "programaInteres"
+exports.getProgramsByConferencista = async (req, res) => {
+  try {
+    const conferencista = req.params.conferencista;
+    const results = await RegistroConferencias.findAll({
+      attributes: [
+        'programaInteres',
+        [Sequelize.fn('COUNT', Sequelize.col('programaInteres')), 'total']
+      ],
+      where: { Conferencista: conferencista },
+      group: ['programaInteres'],
+      order: [[Sequelize.literal('total'), 'DESC']]
+    });
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Obtener asistentes confirmados agrupados por "quien invitó"
+exports.getConfirmedAssistancesByConferencista = async (req, res) => {
+  try {
+    const conferencista = req.params.conferencista;
+    const results = await RegistroConferencias.findAll({
+      attributes: [
+        'Nombre_invito',
+        [Sequelize.fn('COUNT', Sequelize.col('Nombre_invito')), 'total']
+      ],
+      where: {
+        Conferencista: conferencista,
+        asistio: 'SI'
+      },
+      group: ['Nombre_invito'],
+      order: [[Sequelize.literal('total'), 'DESC']]
+    });
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
