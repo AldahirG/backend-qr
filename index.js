@@ -2,7 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const sequelize = require('./config/database');
-require('dotenv').config();
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
 
@@ -10,9 +11,16 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Rutas
+// Importar Rutas
 const registroConferenciasRoutes = require('./routes/registroConferencias');
-app.use('/api/registros', registroConferenciasRoutes);
+const userRoutes = require('./routes/users');
+
+// Rutas Públicas
+app.use('/api/users', userRoutes);
+
+// Rutas Protegidas
+const authenticateToken = require('./middleware/authenticateToken');
+app.use('/api/registros', authenticateToken, registroConferenciasRoutes);
 
 // Sincronizar la base de datos
 sequelize.sync().then(() => {

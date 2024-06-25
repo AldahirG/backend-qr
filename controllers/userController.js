@@ -1,81 +1,35 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+require('dotenv').config();
 
-// Crear un nuevo usuario
-exports.createUser = async (req, res) => {
+exports.register = async (req, res) => {
   try {
-    const newUser = await User.create(req.body);
+    const { user, password, correo } = req.body;
+    const newUser = await User.create({ user, password, correo, acceso: 1 });
     res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Obtener todos los usuarios
-exports.getAllUsers = async (req, res) => {
+exports.login = async (req, res) => {
   try {
-    const users = await User.findAll();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Obtener un usuario por ID
-exports.getUserById = async (req, res) => {
-  try {
-    const user = await User.findByPk(req.params.id);
-    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Actualizar un usuario
-exports.updateUser = async (req, res) => {
-  try {
-    const updatedUser = await User.update(req.body, {
-      where: { id: req.params.id }
-    });
-    if (updatedUser[0] === 0) return res.status(404).json({ message: 'Usuario no encontrado' });
-    res.status(200).json({ message: 'Usuario actualizado' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Eliminar un usuario
-exports.deleteUser = async (req, res) => {
-  try {
-    const deletedUser = await User.destroy({
-      where: { id: req.params.id }
-    });
-    if (!deletedUser) return res.status(404).json({ message: 'Usuario no encontrado' });
-    res.status(200).json({ message: 'Usuario eliminado' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Obtener todos los usuarios con búsqueda opcional por nombre
-exports.getAllUsers = async (req, res) => {
-    try {
-      const { search } = req.query;
-      let users;
-      if (search) {
-        users = await User.findAll({
-          where: {
-            nombre: {
-              [Sequelize.Op.like]: `%${search}%`
-            }
-          }
-        });
-      } else {
-        users = await User.findAll();
-      }
-      res.status(200).json(users);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+    const { user, password } = req.body;
+    if (!user || !password) {
+      return res.status(400).json({ message: 'Usuario y contraseña son requeridos' });
     }
-  };
-  
+    const existingUser = await User.findOne({ where: { user } });
+    if (!existingUser) {
+      return res.status(400).json({ message: 'Usuario no encontrado' });
+    }
+    if (password !== existingUser.password) {
+      return res.status(400).json({ message: 'Contraseña incorrecta' });
+    }
+    const token = jwt.sign({ userId: existingUser.iduserus, user: existingUser.user }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
