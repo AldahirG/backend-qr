@@ -18,9 +18,8 @@ const userRoutes = require('./routes/users');
 // Rutas Públicas
 app.use('/api/users', userRoutes);
 
-// Rutas Protegidas
-const authenticateToken = require('./middleware/authenticateToken');
-app.use('/api/registros', authenticateToken, registroConferenciasRoutes);
+// Rutas Públicas (antes protegidas)
+app.use('/api/registros', registroConferenciasRoutes);  // Verifica que esta ruta esté correctamente configurada
 
 // Sincronizar la base de datos
 sequelize.sync().then(() => {

@@ -1,51 +1,64 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');  // Ajusta la ruta si es necesario
 
 const RegistroConferencias = sequelize.define('RegistroConferencias', {
-  idregistro_conferencias: {
+  idhalloweenfest_registro: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
+    primaryKey: true
   },
-  Nombre: {
+  nombre: {
     type: DataTypes.STRING(90),
-    allowNull: false,
+    allowNull: true
   },
-  Correo: {
-    type: DataTypes.STRING(80),
-    allowNull: false,
+  edad: {
+    type: DataTypes.STRING(5),
+    allowNull: true
   },
-  Telefono: {
+  telefono: {
     type: DataTypes.STRING(15),
-    allowNull: true,
+    allowNull: true
   },
-  Nivel_Estudios: {
-    type: DataTypes.STRING(30),
-    allowNull: true,
+  correo: {
+    type: DataTypes.STRING(75),
+    allowNull: true
   },
-  Conferencista: {
+  escuelaProcedencia: {
     type: DataTypes.STRING(100),
-    allowNull: true,
+    allowNull: true
   },
-  idConferencista: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
+  artista: {
+    type: DataTypes.STRING(100),
+    allowNull: true
   },
-  Nombre_invito: {
-    type: DataTypes.STRING(80),
-    allowNull: true,
+  disfraz: {
+    type: DataTypes.STRING(100),
+    allowNull: true
   },
-  fecha_registro: {
+  varFB: {
+    type: DataTypes.STRING(10),
+    allowNull: true
+  },
+  fechaRegistro: {
     type: DataTypes.DATE,
-    allowNull: true,
+    allowNull: true
+  },
+  promotor: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  invito: {
+    type: DataTypes.STRING(100),
+    allowNull: true
   },
   asistio: {
-    type: DataTypes.STRING(2),
-    defaultValue: 'NO',
-  },
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false 
+  }
 }, {
-  timestamps: false,
-  tableName: 'registro_conferencias'
+  tableName: 'halloweenfest_registro2024',
+  timestamps: false
 });
 
 module.exports = RegistroConferencias;
