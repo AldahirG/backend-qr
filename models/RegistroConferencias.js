@@ -54,7 +54,11 @@ const RegistroConferencias = sequelize.define('RegistroConferencias', {
   asistio: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: false 
+    defaultValue: false
+  },
+  programa: {
+    type: DataTypes.STRING(255),
+    allowNull: true
   }
 }, {
   tableName: 'halloweenfest_registro2024',

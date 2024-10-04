@@ -18,9 +18,13 @@ router.put('/update/:id', registroConferenciasController.updateRegistro);
 router.delete('/delete/:id', registroConferenciasController.deleteRegistro);
 
 // Ruta para obtener asistencias agrupadas por quien invitó
-router.get('/assistances/:conferencista', registroConferenciasController.getAssistancesByConferencista);
+router.get('/assistances', registroConferenciasController.getAssistancesByConferencista);
 
 // Ruta para obtener asistencias confirmadas agrupadas por quien invitó
-router.get('/confirmedAssistances/:conferencista', registroConferenciasController.getConfirmedAssistancesByConferencista);
+router.get('/confirmedAssistances', registroConferenciasController.getConfirmedAssistancesByConferencista);
+
+// Ruta para obtener asistencias agrupadas por programa
+router.get('/assistancesByPrograma', registroConferenciasController.getAssistancesByPrograma);
+
 
 module.exports = router;
