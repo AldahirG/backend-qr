@@ -59,6 +59,11 @@ const RegistroConferencias = sequelize.define('RegistroConferencias', {
   programa: {
     type: DataTypes.STRING(255),
     allowNull: true
+  },
+  // Nuevo campo para cómo se enteró del evento
+  comoEnteroEvento: {
+    type: DataTypes.STRING(255),
+    allowNull: true  // Puedes cambiarlo a `false` si deseas que sea obligatorio
   }
 }, {
   tableName: 'halloweenfest_registro2024',

@@ -11,7 +11,8 @@ exports.createRegistro = async (req, res) => {
   try {
     const newRegistro = await RegistroConferencias.create({
       ...req.body,
-      programa: req.body.programa || null  // Asegura que el campo programa se incluya en el cuerpo de la solicitud
+      programa: req.body.programa || null,  // Asegura que el campo programa se incluya en el cuerpo de la solicitud
+      comoEnteroEvento: req.body.comoEnteroEvento || null // Nuevo campo agregado para como se enteró del evento
     });
     res.status(201).json(newRegistro);
   } catch (error) {
@@ -57,7 +58,8 @@ exports.updateRegistro = async (req, res) => {
 
     await RegistroConferencias.update({
       ...req.body,
-      programa: req.body.programa || registro.programa  // Asegura que el campo programa se pueda actualizar
+      programa: req.body.programa || registro.programa,  // Asegura que el campo programa se pueda actualizar
+      comoEnteroEvento: req.body.comoEnteroEvento || registro.comoEnteroEvento // Actualiza también como se enteró del evento
     }, {
       where: { idhalloweenfest_registro: id }
     });
@@ -89,8 +91,14 @@ exports.deleteRegistro = async (req, res) => {
 exports.getAssistancesByConferencista = async (req, res) => {
   try {
     const assistances = await RegistroConferencias.findAll({
-      attributes: ['invito', [Sequelize.fn('COUNT', Sequelize.col('invito')), 'total']],
-      group: ['invito']
+      attributes: [
+        [Sequelize.literal(`CASE 
+            WHEN invito IS NOT NULL THEN invito 
+            ELSE 'Ninguno' 
+            END`), 'invito'],  // Agrupar los null bajo "Ninguno"
+        [Sequelize.fn('COUNT', Sequelize.col('invito')), 'total']
+      ],
+      group: ['invito'],
     });
 
     return res.json(assistances);
@@ -100,6 +108,7 @@ exports.getAssistancesByConferencista = async (req, res) => {
   }
 };
 
+
 // Obtener asistentes confirmados agrupados por "quien invitó"
 exports.getConfirmedAssistancesByConferencista = async (req, res) => {
   try {
@@ -107,8 +116,14 @@ exports.getConfirmedAssistancesByConferencista = async (req, res) => {
       where: {
         asistio: 1
       },
-      attributes: ['invito', [Sequelize.fn('COUNT', Sequelize.col('invito')), 'total']],
-      group: ['invito']
+      attributes: [
+        [Sequelize.literal(`CASE 
+            WHEN invito IS NOT NULL THEN invito 
+            ELSE 'Ninguno' 
+            END`), 'invito'],  // Agrupar los null bajo "Ninguno"
+        [Sequelize.fn('COUNT', Sequelize.col('invito')), 'total']
+      ],
+      group: ['invito'],
     });
 
     return res.json(confirmedAssistances);
@@ -118,17 +133,47 @@ exports.getConfirmedAssistancesByConferencista = async (req, res) => {
   }
 };
 
+
+
 // Obtener asistencias agrupadas por "programa"
 exports.getAssistancesByPrograma = async (req, res) => {
   try {
     const assistancesByPrograma = await RegistroConferencias.findAll({
-      attributes: ['programa', [Sequelize.fn('COUNT', Sequelize.col('programa')), 'total']],
-      group: ['programa']
+      attributes: [
+        [Sequelize.literal(`CASE 
+            WHEN programa IS NOT NULL THEN programa 
+            ELSE 'Ninguno' 
+            END`), 'programa'],  // Agrupar los null bajo "Ninguno"
+        [Sequelize.fn('COUNT', Sequelize.col('programa')), 'total']
+      ],
+      group: ['programa'],
     });
 
     res.status(200).json(assistancesByPrograma);
   } catch (error) {
     console.error('Error obteniendo las asistencias por programa:', error);
     res.status(500).json({ message: 'Error obteniendo las asistencias' });
+  }
+};
+
+
+// Obtener el conteo de asistentes por el medio en que se enteraron del evento
+exports.getAssistancesByEnteroEvento = async (req, res) => {
+  try {
+    const assistancesByEnteroEvento = await RegistroConferencias.findAll({
+      attributes: [
+        [Sequelize.literal(`CASE 
+            WHEN comoEnteroEvento IS NOT NULL THEN comoEnteroEvento 
+            ELSE 'Ninguno' 
+            END`), 'comoEnteroEvento'],  // Agrupar los null bajo "Ninguno"
+        [Sequelize.fn('COUNT', Sequelize.col('comoEnteroEvento')), 'total']
+      ],
+      group: ['comoEnteroEvento'],
+    });
+
+    res.status(200).json(assistancesByEnteroEvento);
+  } catch (error) {
+    console.error('Error obteniendo el conteo por medio de como se enteraron del evento:', error);
+    res.status(500).json({ message: 'Error obteniendo el conteo' });
   }
 };

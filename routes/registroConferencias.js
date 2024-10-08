@@ -26,5 +26,7 @@ router.get('/confirmedAssistances', registroConferenciasController.getConfirmedA
 // Ruta para obtener asistencias agrupadas por programa
 router.get('/assistancesByPrograma', registroConferenciasController.getAssistancesByPrograma);
 
+// Nuevo endpoint para obtener el conteo de asistentes por el medio que se enteraron del evento
+router.get('/getAssistancesByEnteroEvento', registroConferenciasController.getAssistancesByEnteroEvento);
 
 module.exports = router;
