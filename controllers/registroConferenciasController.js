@@ -11,8 +11,8 @@ exports.createRegistro = async (req, res) => {
   try {
     const newRegistro = await RegistroConferencias.create({
       ...req.body,
-      programa: req.body.programa || null,  // Asegura que el campo programa se incluya en el cuerpo de la solicitud
-      comoEnteroEvento: req.body.comoEnteroEvento || null // Nuevo campo agregado para como se enteró del evento
+      programa: req.body.programa || null, 
+      comoEnteroEvento: req.body.comoEnteroEvento || null 
     });
     res.status(201).json(newRegistro);
   } catch (error) {
@@ -24,7 +24,7 @@ exports.createRegistro = async (req, res) => {
 exports.getAllRegistros = async (req, res) => {
   try {
     const registros = await RegistroConferencias.findAll();
-    res.status(200).json(registros);  // Enviar los registros como respuesta
+    res.status(200).json(registros);  
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -87,29 +87,27 @@ exports.deleteRegistro = async (req, res) => {
   }
 };
 
-// Obtener asistencias agrupadas por "quien invitó"
+// Obtener asistencias agrupadas por "promotor"
 exports.getAssistancesByConferencista = async (req, res) => {
   try {
     const assistances = await RegistroConferencias.findAll({
       attributes: [
         [Sequelize.literal(`CASE 
-            WHEN invito IS NOT NULL THEN invito 
+            WHEN promotor IS NOT NULL THEN promotor 
             ELSE 'Ninguno' 
-            END`), 'invito'],  // Agrupar los null bajo "Ninguno"
-        [Sequelize.fn('COUNT', Sequelize.col('invito')), 'total']
+            END`), 'promotor'],  // Agrupar los null bajo "Ninguno"
+        [Sequelize.fn('COUNT', Sequelize.col('promotor')), 'total']
       ],
-      group: ['invito'],
+      group: ['promotor'],
     });
 
     return res.json(assistances);
   } catch (error) {
-    console.error('Error obteniendo las asistencias por conferencista:', error);
+    console.error('Error obteniendo las asistencias por promotor:', error);
     return res.status(500).json({ message: 'Error obteniendo las asistencias' });
   }
 };
-
-
-// Obtener asistentes confirmados agrupados por "quien invitó"
+// Obtener asistentes confirmados agrupados por "promotor"
 exports.getConfirmedAssistancesByConferencista = async (req, res) => {
   try {
     const confirmedAssistances = await RegistroConferencias.findAll({
@@ -118,22 +116,20 @@ exports.getConfirmedAssistancesByConferencista = async (req, res) => {
       },
       attributes: [
         [Sequelize.literal(`CASE 
-            WHEN invito IS NOT NULL THEN invito 
+            WHEN promotor IS NOT NULL THEN promotor 
             ELSE 'Ninguno' 
-            END`), 'invito'],  // Agrupar los null bajo "Ninguno"
-        [Sequelize.fn('COUNT', Sequelize.col('invito')), 'total']
+            END`), 'promotor'],  // Agrupar los null bajo "Ninguno"
+        [Sequelize.fn('COUNT', Sequelize.col('promotor')), 'total']
       ],
-      group: ['invito'],
+      group: ['promotor'],
     });
 
     return res.json(confirmedAssistances);
   } catch (error) {
-    console.error('Error obteniendo las asistencias confirmadas:', error);
+    console.error('Error obteniendo las asistencias confirmadas por promotor:', error);
     return res.status(500).json({ message: 'Error obteniendo las asistencias confirmadas' });
   }
 };
-
-
 
 // Obtener asistencias agrupadas por "programa"
 exports.getAssistancesByPrograma = async (req, res) => {
