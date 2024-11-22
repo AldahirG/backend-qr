@@ -1,72 +1,98 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');  // Ajusta la ruta si es necesario
+const sequelize = require('../config/database'); // Ajusta la ruta si es necesario
 
 const RegistroConferencias = sequelize.define('RegistroConferencias', {
-  idhalloweenfest_registro: {
+  idregistro_conferencias: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
   },
   nombre: {
     type: DataTypes.STRING(90),
-    allowNull: true
+    allowNull: true,
   },
-  edad: {
-    type: DataTypes.STRING(5),
-    allowNull: true
+  correo: {
+    type: DataTypes.STRING(80),
+    allowNull: true,
   },
   telefono: {
     type: DataTypes.STRING(15),
+    allowNull: true,
+  },
+  Nivel_Estudios: {
+    type: DataTypes.STRING(30),
     allowNull: true
   },
-  correo: {
-    type: DataTypes.STRING(75),
-    allowNull: true
-  },
-  escuelaProcedencia: {
+  Conferencista: {
     type: DataTypes.STRING(100),
     allowNull: true
   },
-  artista: {
-    type: DataTypes.STRING(100),
+  idConferencista: {
+    type: DataTypes.INTEGER,
     allowNull: true
   },
-  disfraz: {
-    type: DataTypes.STRING(100),
+  Nombre_invito: {
+    type: DataTypes.STRING(80),
     allowNull: true
   },
-  varFB: {
+  Facebook: {
     type: DataTypes.STRING(10),
     allowNull: true
   },
-  fechaRegistro: {
+  fecha_registro: {
     type: DataTypes.DATE,
     allowNull: true
   },
-  promotor: {
+  hobbies: {
+    type: DataTypes.STRING(90),
+    allowNull: true
+  },
+  horario_house: {
+    type: DataTypes.STRING(90),
+    allowNull: true
+  },
+  alumno: {
+    type: DataTypes.STRING(90),
+    allowNull: true
+  },
+  promocion: {
+    type: DataTypes.STRING(10),
+    allowNull: true
+  },
+  tipo: {
+    type: DataTypes.STRING(10),
+    allowNull: true
+  },
+  escProc: {
     type: DataTypes.STRING(100),
     allowNull: true
   },
-  invito: {
+  NombreInvito: {
+    type: DataTypes.STRING(45),
+    allowNull: true
+  },
+  NivelUninter: {
+    type: DataTypes.STRING(30),
+    allowNull: true
+  },
+  Reglamento: {
+    type: DataTypes.STRING(10),
+    allowNull: true
+  },
+  programaInteres: {
     type: DataTypes.STRING(100),
     allowNull: true
   },
   asistio: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  },
-  programa: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.STRING(2),
     allowNull: true
   },
-  // Nuevo campo para cómo se enteró del evento
-  comoEnteroEvento: {
-    type: DataTypes.STRING(255),
-    allowNull: true  // Puedes cambiarlo a `false` si deseas que sea obligatorio
+  curp: {
+    type: DataTypes.STRING(18),
+    allowNull: true
   }
 }, {
-  tableName: 'halloweenfest_registro2024',
+  tableName: 'registro_conferencias',
   timestamps: false
 });
 
