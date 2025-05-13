@@ -291,3 +291,32 @@ exports.getAssistancesByEnteroEvento = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getConfirmedAssistancesByProgramaInteres = async (req, res) => {
+  try {
+    const { Conferencista } = req.params;
+
+    console.log('Filtrando por Conferencista:', Conferencista);
+
+    const confirmedAssistances = await RegistroConferencias.findAll({
+      where: {
+        Conferencista: {
+          [Op.eq]: Conferencista.trim(), // Asegurar coincidencia exacta
+        },
+        asistio: 'SI',
+      },
+      attributes: [
+        'programaInteres',
+        [Sequelize.fn('COUNT', Sequelize.col('programaInteres')), 'cantidad_registros'],
+      ],
+      group: ['programaInteres'],
+    });
+
+    console.log('Datos obtenidos:', confirmedAssistances);
+
+    res.status(200).json(confirmedAssistances);
+  } catch (error) {
+    console.error('Error fetching confirmed assistances by programa:', error);
+    res.status(500).json({ message: error.message });
+  }
+};

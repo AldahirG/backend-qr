@@ -29,6 +29,9 @@ router.get('/confirmedAssistancesByNombreInvito/:Conferencista', registroConfere
 // Ruta para obtener asistencias agrupadas por "programaInteres" y filtradas por Conferencista
 router.get('/assistancesByProgramaInteres/:Conferencista', registroConferenciasController.getAssistancesByProgramaInteres);
 
+// Ruta para obtener asistentes confirmados agrupados por "programaInteres" y filtrados por Conferencista
+router.get('/assistancesByProgramaInteresConfirmed/:Conferencista', registroConferenciasController.getConfirmedAssistancesByProgramaInteres);
+
 // Ruta para obtener asistentes agrupados por "comoEnteroEvento" y filtrados por Conferencista
 router.get('/assistancesByEnteroEvento/:Conferencista', registroConferenciasController.getAssistancesByEnteroEvento);
 
