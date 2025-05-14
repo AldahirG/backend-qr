@@ -31,7 +31,7 @@ sequelize.sync().then(() => {
 //   cert: fs.readFileSync('ruta/certificado_publico.crt'),  // Ruta al archivo .crt o .cert
 // };
 
-const PORT = process.env.PORT || 443;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

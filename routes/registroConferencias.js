@@ -2,37 +2,40 @@ const express = require('express');
 const router = express.Router();
 const registroConferenciasController = require('../controllers/registroConferenciasController');
 
-// Ruta para crear un nuevo registro
+// Crear un nuevo registro (requiere ?conferencista=)
 router.post('/create', registroConferenciasController.createRegistro);
 
-// Ruta para obtener todos los registros filtrados por Conferencista
-router.get('/getAll/:Conferencista', registroConferenciasController.getAllRegistros);
+// Obtener todos los registros (requiere ?conferencista=)
+router.get('/', registroConferenciasController.getAllRegistros);
 
-// Ruta para obtener un registro por ID filtrado por Conferencista
-router.get('/get/:id/:Conferencista', registroConferenciasController.getRegistroById);
+// Obtener un registro por ID (requiere ?conferencista=)
+router.get('/:id', registroConferenciasController.getRegistroById);
 
-// Ruta para actualizar un registro por ID filtrado por Conferencista
-router.put('/update/:id/:Conferencista', registroConferenciasController.updateRegistro);
+// Actualizar un registro por ID (requiere ?conferencista=)
+router.put('/:id', registroConferenciasController.updateRegistro);
 
-// Ruta para eliminar un registro por ID filtrado por Conferencista
-router.delete('/delete/:id/:Conferencista', registroConferenciasController.deleteRegistro);
+// Eliminar un registro por ID (requiere ?conferencista=)
+router.delete('/:id', registroConferenciasController.deleteRegistro);
 
-// Ruta para buscar registros por texto filtrados por Conferencista
-router.get('/search/:query/:Conferencista', registroConferenciasController.searchRegistros);
+// Buscar registros por texto (?query=...&conferencista=)
+router.get('/buscar/texto', registroConferenciasController.searchRegistros);
 
-// Ruta para obtener asistencias agrupadas por "Nombre_invito" y filtradas por Conferencista
-router.get('/assistancesByNombreInvito/:Conferencista', registroConferenciasController.getAssistancesByNombreInvito);
+// Estadísticas agrupadas por Nombre_invito (requiere ?conferencista=)
+router.get('/estadisticas/nombre-invito', registroConferenciasController.getAssistancesByNombreInvito);
 
-// Ruta para obtener asistencias confirmadas agrupadas por "Nombre_invito" y filtradas por Conferencista
-router.get('/confirmedAssistancesByNombreInvito/:Conferencista', registroConferenciasController.getConfirmedAssistancesByNombreInvito);
+// Confirmados por Nombre_invito (requiere ?conferencista=)
+router.get('/estadisticas/nombre-invito/confirmados', registroConferenciasController.getConfirmedAssistancesByNombreInvito);
 
-// Ruta para obtener asistencias agrupadas por "programaInteres" y filtradas por Conferencista
-router.get('/assistancesByProgramaInteres/:Conferencista', registroConferenciasController.getAssistancesByProgramaInteres);
+// Agrupados por programaInteres (requiere ?conferencista=)
+router.get('/estadisticas/programa-interes', registroConferenciasController.getAssistancesByProgramaInteres);
 
-// Ruta para obtener asistentes confirmados agrupados por "programaInteres" y filtrados por Conferencista
-router.get('/assistancesByProgramaInteresConfirmed/:Conferencista', registroConferenciasController.getConfirmedAssistancesByProgramaInteres);
+// Confirmados por programaInteres (requiere ?conferencista=)
+router.get('/estadisticas/programa-interes/confirmados', registroConferenciasController.getConfirmedAssistancesByProgramaInteres);
 
-// Ruta para obtener asistentes agrupados por "comoEnteroEvento" y filtrados por Conferencista
-router.get('/assistancesByEnteroEvento/:Conferencista', registroConferenciasController.getAssistancesByEnteroEvento);
+// Agrupados por comoEnteroEvento (requiere ?conferencista=)
+router.get('/estadisticas/entero-evento', registroConferenciasController.getAssistancesByEnteroEvento);
+
+// Obtener conferencistas únicos por mes (?mes=2025-05)
+router.get('/eventos/por-mes', registroConferenciasController.getEventosPorMes);
 
 module.exports = router;

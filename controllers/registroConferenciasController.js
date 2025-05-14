@@ -1,26 +1,17 @@
 const RegistroConferencias = require('../models/RegistroConferencias');
 const { Sequelize, Op } = require('sequelize');
 
+// Crear registro
 exports.createRegistro = async (req, res) => {
   try {
-    // Depuración: Verifica el contenido del req.body
-    console.log('Datos recibidos en el backend:', req.body);
+    const { conferencista } = req.query;
+    if (!conferencista) {
+      return res.status(400).json({ message: 'El parámetro "conferencista" es obligatorio para crear un registro.' });
+    }
 
-    // Crea el registro
     const newRegistro = await RegistroConferencias.create({
-      nombre: req.body.nombre || null,
-      correo: req.body.correo || null,
-      telefono: req.body.telefono || null,
-      Nivel_Estudios: req.body.Nivel_Estudios || null,
-      Conferencista: req.body.Conferencista || null,
-      Nombre_invito: req.body.Nombre_invito || null,
-      fecha_registro: req.body.fecha_registro || null,
-      alumno: req.body.alumno || null,
-      tipo: req.body.tipo || null,
-      escProc: req.body.escProc || null,
-      NivelUninter: req.body.NivelUninter || null,
-      programaInteres: req.body.programaInteres || null,
-      asistio: req.body.asistio || null,
+      ...req.body,
+      Conferencista: conferencista
     });
 
     res.status(201).json(newRegistro);
@@ -30,29 +21,17 @@ exports.createRegistro = async (req, res) => {
   }
 };
 
-
 // Obtener todos los registros filtrados por Conferencista
 exports.getAllRegistros = async (req, res) => {
   try {
-    const { Conferencista } = req.params;
-
-    if (!Conferencista) {
-      return res.status(400).json({ message: 'El parámetro "Conferencista" es obligatorio.' });
-    }
+    const { conferencista } = req.query;
+    if (!conferencista) return res.status(400).json({ message: 'Parámetro "conferencista" requerido.' });
 
     const registros = await RegistroConferencias.findAll({
-      where: {
-        Conferencista: {
-          [Op.like]: `%${Conferencista}%`,
-        },
-      },
+      where: { Conferencista: { [Op.like]: `%${conferencista}%` } },
     });
 
-    if (registros.length === 0) {
-      return res.status(404).json({ message: 'No se encontraron registros para el Conferencista proporcionado.' });
-    }
-
-    res.status(200).json(registros);
+    res.status(registros.length ? 200 : 404).json(registros);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -61,22 +40,18 @@ exports.getAllRegistros = async (req, res) => {
 // Obtener un registro por ID filtrado por Conferencista
 exports.getRegistroById = async (req, res) => {
   try {
-    const { id, Conferencista } = req.params;
+    const { id } = req.params;
+    const { conferencista } = req.query;
+    if (!conferencista) return res.status(400).json({ message: 'Parámetro "conferencista" requerido.' });
 
     const registro = await RegistroConferencias.findOne({
       where: {
         idregistro_conferencias: id,
-        Conferencista: {
-          [Op.like]: `%${Conferencista}%`,
-        },
+        Conferencista: { [Op.like]: `%${conferencista}%` },
       },
     });
 
-    if (!registro) {
-      return res.status(404).json({ message: 'Registro no encontrado' });
-    }
-
-    res.status(200).json(registro);
+    res.status(registro ? 200 : 404).json(registro || { message: 'Registro no encontrado' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -85,35 +60,20 @@ exports.getRegistroById = async (req, res) => {
 // Actualizar un registro por ID filtrado por Conferencista
 exports.updateRegistro = async (req, res) => {
   try {
-    const { id, Conferencista } = req.params;
+    const { id } = req.params;
+    const { conferencista } = req.query;
+    if (!conferencista) return res.status(400).json({ message: 'Parámetro "conferencista" requerido.' });
 
-    const registro = await RegistroConferencias.findOne({
+    const [updated] = await RegistroConferencias.update(req.body, {
       where: {
         idregistro_conferencias: id,
-        Conferencista: {
-          [Op.like]: `%${Conferencista}%`,
-        },
+        Conferencista: { [Op.like]: `%${conferencista}%` },
       },
     });
 
-    if (!registro) {
-      return res.status(404).json({ message: 'Registro no encontrado' });
-    }
-
-    await RegistroConferencias.update(
-      { ...req.body },
-      {
-        where: {
-          idregistro_conferencias: id,
-          Conferencista: {
-            [Op.like]: `%${Conferencista}%`,
-          },
-        },
-      }
-    );
-
-    const updatedRegistro = await RegistroConferencias.findByPk(id);
-    res.status(200).json(updatedRegistro);
+    if (!updated) return res.status(404).json({ message: 'Registro no encontrado' });
+    const registroActualizado = await RegistroConferencias.findByPk(id);
+    res.status(200).json(registroActualizado);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -122,22 +82,18 @@ exports.updateRegistro = async (req, res) => {
 // Eliminar un registro por ID filtrado por Conferencista
 exports.deleteRegistro = async (req, res) => {
   try {
-    const { id, Conferencista } = req.params;
+    const { id } = req.params;
+    const { conferencista } = req.query;
+    if (!conferencista) return res.status(400).json({ message: 'Parámetro "conferencista" requerido.' });
 
-    const deletedRegistro = await RegistroConferencias.destroy({
+    const deleted = await RegistroConferencias.destroy({
       where: {
         idregistro_conferencias: id,
-        Conferencista: {
-          [Op.like]: `%${Conferencista}%`,
-        },
+        Conferencista: { [Op.like]: `%${conferencista}%` },
       },
     });
 
-    if (!deletedRegistro) {
-      return res.status(404).json({ message: 'Registro no encontrado' });
-    }
-
-    res.status(200).json({ message: 'Registro eliminado' });
+    res.status(deleted ? 200 : 404).json(deleted ? { message: 'Registro eliminado' } : { message: 'Registro no encontrado' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -146,177 +102,88 @@ exports.deleteRegistro = async (req, res) => {
 // Buscar registros por coincidencia filtrados por Conferencista
 exports.searchRegistros = async (req, res) => {
   try {
-    const { query, Conferencista } = req.params;
+    const { query, conferencista } = req.query;
+    if (!query || !conferencista) return res.status(400).json({ message: 'Parámetros "query" y "conferencista" requeridos.' });
 
     const registros = await RegistroConferencias.findAll({
       where: {
-        Conferencista: {
-          [Op.like]: `%${Conferencista}%`,
-        },
+        Conferencista: { [Op.like]: `%${conferencista}%` },
         [Op.or]: [
-          { Nombre: { [Op.like]: `%${query}%` } },
-          { Correo: { [Op.like]: `%${query}%` } },
-          { Telefono: { [Op.like]: `%${query}%` } },
+          { nombre: { [Op.like]: `%${query}%` } },
+          { correo: { [Op.like]: `%${query}%` } },
+          { telefono: { [Op.like]: `%${query}%` } },
         ],
       },
     });
 
-    if (registros.length === 0) {
-      return res.status(404).json({ message: 'No se encontraron registros que coincidan' });
+    res.status(registros.length ? 200 : 404).json(registros);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Helpers para agrupaciones genéricas
+const generarAgrupacion = (campo, soloConfirmados = false) => async (req, res) => {
+  try {
+    const { conferencista } = req.query;
+    if (!conferencista) return res.status(400).json({ message: 'Parámetro "conferencista" requerido.' });
+
+    const where = {
+      Conferencista: { [Op.like]: `%${conferencista}%` },
+      ...(soloConfirmados ? { asistio: 'SI' } : {}),
+    };
+
+    const resultados = await RegistroConferencias.findAll({
+      where,
+      attributes: [
+        [
+          Sequelize.literal(`CASE WHEN ${campo} IS NOT NULL THEN ${campo} ELSE 'Ninguno' END`),
+          campo,
+        ],
+        [Sequelize.fn('COUNT', Sequelize.col(campo)), 'total'],
+      ],
+      group: [campo],
+    });
+
+    res.status(200).json(resultados);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getAssistancesByNombreInvito = generarAgrupacion('Nombre_invito');
+exports.getConfirmedAssistancesByNombreInvito = generarAgrupacion('Nombre_invito', true);
+exports.getAssistancesByProgramaInteres = generarAgrupacion('programaInteres');
+exports.getConfirmedAssistancesByProgramaInteres = generarAgrupacion('programaInteres', true);
+exports.getAssistancesByEnteroEvento = generarAgrupacion('comoEnteroEvento');
+
+// Eventos únicos por mes
+exports.getEventosPorMes = async (req, res) => {
+  try {
+    const { mes } = req.query;
+    if (!mes || !/^\d{4}-\d{2}$/.test(mes)) {
+      return res.status(400).json({ message: 'El parámetro "mes" debe tener formato YYYY-MM' });
     }
 
-    res.status(200).json(registros);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+    const inicio = `${mes}-01`;
 
-// Obtener asistencias agrupadas por "Nombre_invito" filtradas por Conferencista
-exports.getAssistancesByNombreInvito = async (req, res) => {
-  try {
-    const { Conferencista } = req.params;
-
-    const assistances = await RegistroConferencias.findAll({
-      where: {
-        Conferencista: {
-          [Op.like]: `%${Conferencista}%`,
-        },
-      },
-      attributes: [
-        [
-          Sequelize.literal(`CASE 
-            WHEN Nombre_invito IS NOT NULL THEN Nombre_invito 
-            ELSE 'Ninguno' 
-            END`),
-          'Nombre_invito',
-        ],
-        [Sequelize.fn('COUNT', Sequelize.col('Nombre_invito')), 'total'],
-      ],
-      group: ['Nombre_invito'],
+    const result = await RegistroConferencias.sequelize.query(`
+      SELECT DISTINCT Conferencista
+      FROM registro_conferencias
+      WHERE fecha_registro >= :inicio
+        AND Conferencista IS NOT NULL
+        AND Conferencista != ''
+    `, {
+      replacements: { inicio },
+      type: RegistroConferencias.sequelize.QueryTypes.SELECT
     });
 
-    res.status(200).json(assistances);
+    if (!result || result.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron eventos para ese mes.' });
+    }
+
+    res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Obtener asistentes confirmados agrupados por "Nombre_invito" filtrados por Conferencista
-exports.getConfirmedAssistancesByNombreInvito = async (req, res) => {
-  try {
-    const { Conferencista } = req.params;
-
-    const confirmedAssistances = await RegistroConferencias.findAll({
-      where: {
-        Conferencista: {
-          [Op.like]: `%${Conferencista}%`,
-        },
-        asistio: 'SI',
-      },
-      attributes: [
-        [
-          Sequelize.literal(`CASE 
-            WHEN Nombre_invito IS NOT NULL THEN Nombre_invito 
-            ELSE 'Ninguno' 
-            END`),
-          'Nombre_invito',
-        ],
-        [Sequelize.fn('COUNT', Sequelize.col('Nombre_invito')), 'total'],
-      ],
-      group: ['Nombre_invito'],
-    });
-
-    res.status(200).json(confirmedAssistances);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Obtener asistencias agrupadas por "programaInteres" filtradas por Conferencista
-exports.getAssistancesByProgramaInteres = async (req, res) => {
-  try {
-    const { Conferencista } = req.params;
-
-    const assistancesByProgramaInteres = await RegistroConferencias.findAll({
-      where: {
-        Conferencista: {
-          [Op.like]: `%${Conferencista}%`,
-        },
-      },
-      attributes: [
-        [
-          Sequelize.literal(`CASE 
-            WHEN programaInteres IS NOT NULL THEN programaInteres 
-            ELSE 'Ninguno' 
-            END`),
-          'programaInteres',
-        ],
-        [Sequelize.fn('COUNT', Sequelize.col('programaInteres')), 'total'],
-      ],
-      group: ['programaInteres'],
-    });
-
-    res.status(200).json(assistancesByProgramaInteres);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Obtener asistentes agrupados por "comoEnteroEvento" filtrados por Conferencista
-exports.getAssistancesByEnteroEvento = async (req, res) => {
-  try {
-    const { Conferencista } = req.params;
-
-    const assistancesByEnteroEvento = await RegistroConferencias.findAll({
-      where: {
-        Conferencista: {
-          [Op.like]: `%${Conferencista}%`,
-        },
-      },
-      attributes: [
-        [
-          Sequelize.literal(`CASE 
-            WHEN comoEnteroEvento IS NOT NULL THEN comoEnteroEvento 
-            ELSE 'Ninguno' 
-            END`),
-          'comoEnteroEvento',
-        ],
-        [Sequelize.fn('COUNT', Sequelize.col('comoEnteroEvento')), 'total'],
-      ],
-      group: ['comoEnteroEvento'],
-    });
-
-    res.status(200).json(assistancesByEnteroEvento);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.getConfirmedAssistancesByProgramaInteres = async (req, res) => {
-  try {
-    const { Conferencista } = req.params;
-
-    console.log('Filtrando por Conferencista:', Conferencista);
-
-    const confirmedAssistances = await RegistroConferencias.findAll({
-      where: {
-        Conferencista: {
-          [Op.eq]: Conferencista.trim(), // Asegurar coincidencia exacta
-        },
-        asistio: 'SI',
-      },
-      attributes: [
-        'programaInteres',
-        [Sequelize.fn('COUNT', Sequelize.col('programaInteres')), 'cantidad_registros'],
-      ],
-      group: ['programaInteres'],
-    });
-
-    console.log('Datos obtenidos:', confirmedAssistances);
-
-    res.status(200).json(confirmedAssistances);
-  } catch (error) {
-    console.error('Error fetching confirmed assistances by programa:', error);
     res.status(500).json({ message: error.message });
   }
 };
