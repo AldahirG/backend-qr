@@ -15,9 +15,9 @@ app.use(cors());
 const registroConferenciasRoutes = require('./routes/registroConferencias');
 const userRoutes = require('./routes/users');
 
-app.use('/api/users', userRoutes);
+app.use('/api/qr/registros', registroConferenciasRoutes);
+app.use('/api/qr/users', userRoutes);
 
-app.use('/api/registros', registroConferenciasRoutes);  
 
 sequelize.sync().then(() => {
   console.log('Sincronizado con la base de datos');

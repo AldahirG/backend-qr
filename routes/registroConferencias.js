@@ -38,4 +38,8 @@ router.get('/estadisticas/entero-evento', registroConferenciasController.getAssi
 // Obtener conferencistas únicos por mes (?mes=2025-05)
 router.get('/eventos/por-mes', registroConferenciasController.getEventosPorMes);
 
+// Obtener reporte de asistencia por evento (?evento=)
+router.get('/export/excel', registroConferenciasController.exportarReporteExcel);
+
+
 module.exports = router;

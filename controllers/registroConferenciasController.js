@@ -1,5 +1,7 @@
 const RegistroConferencias = require('../models/RegistroConferencias');
 const { Sequelize, Op } = require('sequelize');
+const ExcelJS = require('exceljs');
+
 
 // Crear registro
 exports.createRegistro = async (req, res) => {
@@ -185,5 +187,87 @@ exports.getEventosPorMes = async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+
+// Exportar reporte de asistencia a Excel ordenado y con totales
+exports.exportarReporteExcel = async (req, res) => {
+  try {
+    const { conferencista } = req.query;
+    if (!conferencista) {
+      return res.status(400).json({ message: 'Parámetro "conferencista" requerido.' });
+    }
+
+    const data1 = await RegistroConferencias.findAll({
+      where: { Conferencista: { [Op.like]: `%${conferencista}%` } },
+      attributes: ['Nombre_invito', [Sequelize.fn('COUNT', Sequelize.col('Nombre_invito')), 'total']],
+      group: ['Nombre_invito']
+    });
+
+    const data2 = await RegistroConferencias.findAll({
+      where: {
+        Conferencista: { [Op.like]: `%${conferencista}%` },
+        asistio: 'SI'
+      },
+      attributes: ['Nombre_invito', [Sequelize.fn('COUNT', Sequelize.col('Nombre_invito')), 'total']],
+      group: ['Nombre_invito']
+    });
+
+    const data3 = await RegistroConferencias.findAll({
+      where: { Conferencista: { [Op.like]: `%${conferencista}%` } },
+      attributes: ['programaInteres', [Sequelize.fn('COUNT', Sequelize.col('programaInteres')), 'total']],
+      group: ['programaInteres']
+    });
+
+    const data4 = await RegistroConferencias.findAll({
+      where: {
+        Conferencista: { [Op.like]: `%${conferencista}%` },
+        asistio: 'SI'
+      },
+      attributes: ['programaInteres', [Sequelize.fn('COUNT', Sequelize.col('programaInteres')), 'cantidad_registros']],
+      group: ['programaInteres']
+    });
+
+    const workbook = new ExcelJS.Workbook();
+
+    const sheets = [
+      { name: 'Por Invitador', data: data1, columns: ['Nombre_invito', 'total'] },
+      { name: 'Confirmadas', data: data2, columns: ['Nombre_invito', 'total'] },
+      { name: 'Por Programa', data: data3, columns: ['programaInteres', 'total'] },
+      { name: 'Confirmadas Programa', data: data4, columns: ['programaInteres', 'cantidad_registros'] }
+    ];
+
+    sheets.forEach(sheet => {
+      const worksheet = workbook.addWorksheet(sheet.name);
+      worksheet.addRow(sheet.columns);
+
+      // Ordenar datos de mayor a menor por la columna de totales
+      const totalKey = sheet.columns[1];
+      const sortedData = sheet.data
+        .map(row => ({
+          ...row.dataValues,
+          [totalKey]: Number(row.get(totalKey)) || 0
+        }))
+        .sort((a, b) => b[totalKey] - a[totalKey]);
+
+      // Insertar filas ordenadas
+      sortedData.forEach(row => {
+        worksheet.addRow(sheet.columns.map(col => row[col]));
+      });
+
+      // Calcular e insertar fila de TOTAL
+      const total = sortedData.reduce((sum, row) => sum + row[totalKey], 0);
+      worksheet.addRow(['TOTAL', total]);
+    });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=Reporte_Asistencias.xlsx`);
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error('Error al exportar Excel:', error);
+    res.status(500).json({ message: 'Error al generar el Excel' });
   }
 };
